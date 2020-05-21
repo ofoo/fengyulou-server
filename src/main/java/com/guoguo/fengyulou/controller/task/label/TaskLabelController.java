@@ -36,8 +36,8 @@ public class TaskLabelController {
      * @return
      */
     @RequestMapping("/taskLabel/list/page")
-    public String list(HttpServletRequest request, HttpSession session, TaskLabel taskLabel) {
-        taskLabel.setUserId(currentUserManager.getUserId());
+    public String list(HttpServletRequest request, @RequestParam String userKey, TaskLabel taskLabel) {
+        taskLabel.setUserId(currentUserManager.getUserId(userKey));
         request.setAttribute("pageInfo", taskLabelService.getTaskLabelListPage(taskLabel));
         request.setAttribute("data", taskLabel);
         return "task/label/task-label-list";
@@ -64,10 +64,10 @@ public class TaskLabelController {
      * @return
      */
     @RequestMapping("/taskLabel/update")
-    public String update(HttpServletRequest request, HttpSession session, TaskLabel taskLabel) {
+    public String update(HttpServletRequest request, @RequestParam String userKey, TaskLabel taskLabel) {
         request.setAttribute("pageTitle", "修改任务标签");
         // 查询任务标签
-        taskLabel.setUserId(currentUserManager.getUserId());
+        taskLabel.setUserId(currentUserManager.getUserId(userKey));
         request.setAttribute("data", taskLabelService.getTaskLabelByIdAndUserId(taskLabel));
         return "task/label/task-label-save";
     }
@@ -80,11 +80,11 @@ public class TaskLabelController {
      */
     @RequestMapping("/taskLabel/ajax/save")
     @ResponseBody
-    public ServerResponse ajaxSave(TaskLabel taskLabel, HttpSession session) {
+    public ServerResponse ajaxSave(TaskLabel taskLabel, @RequestParam String userKey) {
         if (StringUtils.isBlank(taskLabel.getName())) {
             return ServerResponse.createByErrorMessage("请输入任务标签名称");
         }
-        taskLabel.setUserId(currentUserManager.getUserId());
+        taskLabel.setUserId(currentUserManager.getUserId(userKey));
         return taskLabelService.saveTaskLabel(taskLabel);
     }
 
@@ -96,11 +96,11 @@ public class TaskLabelController {
      */
     @RequestMapping("/taskLabel/ajax/delete")
     @ResponseBody
-    public ServerResponse ajaxDelete(@RequestParam List<Long> ids, HttpSession session) {
+    public ServerResponse ajaxDelete(@RequestParam List<Long> ids, @RequestParam String userKey) {
         if (ObjectUtils.isNull(ids)) {
             return ServerResponse.createByErrorMessage("请选择数据");
         }
-        return taskLabelService.deleteTaskLabelByIdsAndUserId(ids, currentUserManager.getUserId());
+        return taskLabelService.deleteTaskLabelByIdsAndUserId(ids, currentUserManager.getUserId(userKey));
     }
 
     /**
@@ -109,9 +109,9 @@ public class TaskLabelController {
      * @return
      */
     @RequestMapping("/taskLabel/ajax/list")
-    public String ajaxList(HttpServletRequest request, HttpSession session) {
+    public String ajaxList(HttpServletRequest request, @RequestParam String userKey) {
         TaskLabel taskLabel = new TaskLabel();
-        taskLabel.setUserId(currentUserManager.getUserId());
+        taskLabel.setUserId(currentUserManager.getUserId(userKey));
         request.setAttribute("list", taskLabelService.getTaskLabelList(taskLabel));
         return "/common/select-item";
     }

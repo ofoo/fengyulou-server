@@ -1,5 +1,6 @@
 package com.guoguo.common;
 
+import lombok.Data;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -10,6 +11,7 @@ import java.io.Serializable;
  */
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 //保证序列化json的时候,如果是null的对象,key也会消失
+@Data
 public class ServerResponse<T> implements Serializable {
 
     private int status;

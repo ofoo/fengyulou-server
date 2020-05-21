@@ -15,7 +15,7 @@ public interface UserService {
      * @param user
      * @return
      */
-    ServerResponse login(User user);
+    User login(User user);
 
     /**
      * 按id修改用户密码
@@ -23,7 +23,7 @@ public interface UserService {
      * @param password
      * @return
      */
-    ServerResponse updatePasswordById(String password);
+    ServerResponse updatePasswordById(String userKey, String password);
 
     /**
      * 按条件分页查询

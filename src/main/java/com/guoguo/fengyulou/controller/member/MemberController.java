@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -42,9 +41,9 @@ public class MemberController {
      * @return
      */
     @RequestMapping("/member/list/page")
-    public String list(HttpServletRequest request, HttpSession session, Member member) {
+    public String list(HttpServletRequest request, @RequestParam String userKey, Member member) {
         request.setAttribute("data", member);
-        member.setUserId(currentUserManager.getUserId());
+        member.setUserId(currentUserManager.getUserId(userKey));
         request.setAttribute("pageInfo", memberService.getMemberListPage(member));
         return "/member/member-list";
     }
@@ -56,11 +55,11 @@ public class MemberController {
      * @return
      */
     @RequestMapping("/member/insert")
-    public String insert(HttpServletRequest request, HttpSession session) {
+    public String insert(HttpServletRequest request, @RequestParam String userKey) {
         request.setAttribute("pageTitle", "添加人员");
         // 查询人员标签列表
         MemberLabel memberLabel = new MemberLabel();
-        memberLabel.setUserId(currentUserManager.getUserId());
+        memberLabel.setUserId(currentUserManager.getUserId(userKey));
         request.setAttribute("memberLabelList", memberLabelService.getMemberLabelList(memberLabel));
         // task=任务页面打开
         String str = request.getParameter("str");
@@ -78,10 +77,10 @@ public class MemberController {
      * @return
      */
     @RequestMapping("/member/update")
-    public String update(HttpServletRequest request, HttpSession session, Member member) {
+    public String update(HttpServletRequest request, @RequestParam String userKey, Member member) {
         request.setAttribute("pageTitle", "修改人员");
         //获取用户id
-        Long userId = currentUserManager.getUserId();
+        Long userId = currentUserManager.getUserId(userKey);
         // 查询人员
         member.setUserId(userId);
         request.setAttribute("data", memberService.getMemberByIdAndUserId(member));
@@ -100,14 +99,14 @@ public class MemberController {
      */
     @RequestMapping("/member/ajax/save")
     @ResponseBody
-    public ServerResponse ajaxSave(Member member, HttpSession session) {
+    public ServerResponse ajaxSave(Member member, @RequestParam String userKey) {
         if (StringUtils.isBlank(member.getName())) {
             return ServerResponse.createByErrorMessage("请输入人员名称");
         }
         if (ObjectUtils.isNull(member.getMemberLabelId())) {
             return ServerResponse.createByErrorMessage("请选择人员标签");
         }
-        member.setUserId(currentUserManager.getUserId());
+        member.setUserId(currentUserManager.getUserId(userKey));
         return memberService.saveMember(member);
     }
 
@@ -119,11 +118,11 @@ public class MemberController {
      */
     @RequestMapping("/member/ajax/delete")
     @ResponseBody
-    public ServerResponse ajaxDelete(@RequestParam List<Long> ids, HttpSession session) {
+    public ServerResponse ajaxDelete(@RequestParam List<Long> ids, @RequestParam String userKey) {
         if (ObjectUtils.isNull(ids)) {
             return ServerResponse.createByErrorMessage("请选择数据");
         }
-        return memberService.deleteMemberByIdsAndUserId(ids, currentUserManager.getUserId());
+        return memberService.deleteMemberByIdsAndUserId(ids, currentUserManager.getUserId(userKey));
     }
 
     /**
@@ -133,9 +132,9 @@ public class MemberController {
      * @return
      */
     @RequestMapping("/member/ajax/list")
-    public String ajaxList(HttpServletRequest request, HttpSession session) {
+    public String ajaxList(HttpServletRequest request, @RequestParam String userKey) {
         Member member = new Member();
-        member.setUserId(currentUserManager.getUserId());
+        member.setUserId(currentUserManager.getUserId(userKey));
         request.setAttribute("list", memberService.getMemberList(member));
         return "common/select-item";
     }

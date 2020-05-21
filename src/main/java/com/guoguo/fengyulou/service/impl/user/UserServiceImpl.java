@@ -26,20 +26,20 @@ public class UserServiceImpl implements UserService {
     private CurrentUserManager currentUserManager;
 
     @Override
-    public ServerResponse login(User user) {
+    public User login(User user) {
         User tem = userDao.getUserByLoginName(user.getLoginName().trim());
         if (ObjectUtils.isNotNull(tem)) {
             user.setPassword(MD5Util.MD5EncodeUtf8(user.getPassword()));
             if (tem.getPassword().equals(user.getPassword())) {
-                return ServerResponse.createBySuccess("登录成功", tem);
+                return tem;
             }
         }
-        return ServerResponse.createByErrorMessage("账号或密码错误");
+        return null;
     }
 
     @Override
-    public ServerResponse updatePasswordById(String password) {
-        User user = currentUserManager.getUser();
+    public ServerResponse updatePasswordById(String userKey, String password) {
+        User user = currentUserManager.getUser(userKey);
         user.setPassword(MD5Util.MD5EncodeUtf8(password));
         int rows = userDao.updatePasswordById(user);
         if (rows > 0) {

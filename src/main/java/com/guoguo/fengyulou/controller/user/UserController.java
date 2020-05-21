@@ -11,10 +11,7 @@ import com.guoguo.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +21,7 @@ import java.util.List;
 /**
  * 用户管理
  */
-@Controller
+@RestController
 @RequestMapping("/fyl")
 public class UserController {
 
@@ -109,25 +106,25 @@ public class UserController {
      * @param user
      * @return
      */
-    @RequestMapping("/user/ajaxLogin")
-    @ResponseBody
-    public ServerResponse ajaxLogin(HttpServletResponse response, User user) {
-        ServerResponse<User> serverResponse = userService.login(user);
-        if (serverResponse.isSuccess()) {
-            currentUserManager.login(response, serverResponse.getData());
+    @RequestMapping("/user/login")
+    public ServerResponse login(HttpServletResponse response, User user) {
+        User tem = userService.login(user);
+        if (ObjectUtils.isNotNull(tem)) {
+            String userKey = currentUserManager.login(tem);
+            return ServerResponse.createBySuccess("登录成功", userKey);
         }
-        return serverResponse;
+        return ServerResponse.createByErrorMessage("账号或密码错误");
     }
 
     /**
      * 用户退出
      *
-     * @param response
+     * @param userKey
      * @return
      */
     @RequestMapping("/user/logout")
-    public String logout(HttpServletResponse response) {
-        currentUserManager.logout(response);
+    public String logout(@RequestParam String userKey) {
+        currentUserManager.logout(userKey);
         return "redirect:" + CommonConstant.LOGIN;
     }
 
@@ -140,10 +137,10 @@ public class UserController {
      */
     @RequestMapping("/user/ajaxUpdatePwd")
     @ResponseBody
-    public ServerResponse ajaxUpdatePwd(HttpServletResponse response, @RequestParam String pwd) {
-        ServerResponse serverResponse = userService.updatePasswordById(pwd);
+    public ServerResponse ajaxUpdatePwd(@RequestParam String userKey, @RequestParam String pwd) {
+        ServerResponse serverResponse = userService.updatePasswordById(userKey, pwd);
         if (serverResponse.isSuccess()) {
-            currentUserManager.logout(response);
+            currentUserManager.logout(userKey);
         }
         return serverResponse;
     }

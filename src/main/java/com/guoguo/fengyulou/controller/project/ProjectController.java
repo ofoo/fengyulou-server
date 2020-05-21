@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -34,8 +33,8 @@ public class ProjectController {
      * @return
      */
     @RequestMapping("/project/list/page")
-    public String list(HttpServletRequest request, HttpSession session, Project project) {
-        project.setUserId(currentUserManager.getUserId());
+    public String list(HttpServletRequest request, @RequestParam String userKey, Project project) {
+        project.setUserId(currentUserManager.getUserId(userKey));
         request.setAttribute("pageInfo", projectService.getProjectListPage(project));
         request.setAttribute("data", project);
         return "project/project-list";
@@ -48,7 +47,7 @@ public class ProjectController {
      * @return
      */
     @RequestMapping("/project/insert")
-    public String insert(HttpServletRequest request, HttpSession session) {
+    public String insert(HttpServletRequest request, @RequestParam String userKey) {
         request.setAttribute("pageTitle", "添加项目");
         return "project/project-save";
     }
@@ -62,10 +61,10 @@ public class ProjectController {
      * @return
      */
     @RequestMapping("/project/update")
-    public String update(HttpServletRequest request, HttpSession session, Project project) {
+    public String update(HttpServletRequest request, @RequestParam String userKey, Project project) {
         request.setAttribute("pageTitle", "修改项目");
         // 查询项目
-        project.setUserId(currentUserManager.getUserId());
+        project.setUserId(currentUserManager.getUserId(userKey));
         request.setAttribute("data", projectService.getProjectByIdAndUserId(project));
         return "project/project-save";
     }
@@ -78,11 +77,11 @@ public class ProjectController {
      */
     @RequestMapping("/project/ajax/save")
     @ResponseBody
-    public ServerResponse ajaxSave(Project project, HttpSession session) {
+    public ServerResponse ajaxSave(Project project, @RequestParam String userKey) {
         if (StringUtils.isBlank(project.getName())) {
             return ServerResponse.createByErrorMessage("请输入项目名称");
         }
-        project.setUserId(currentUserManager.getUserId());
+        project.setUserId(currentUserManager.getUserId(userKey));
         return projectService.saveProject(project);
     }
 
@@ -94,11 +93,11 @@ public class ProjectController {
      */
     @RequestMapping("/project/ajax/delete")
     @ResponseBody
-    public ServerResponse ajaxDelete(@RequestParam List<Long> ids, HttpSession session) {
+    public ServerResponse ajaxDelete(@RequestParam List<Long> ids, @RequestParam String userKey) {
         if (ObjectUtils.isNull(ids)) {
             return ServerResponse.createByErrorMessage("请选择数据");
         }
-        return projectService.deleteProjectByIdsAndUserId(ids, currentUserManager.getUserId());
+        return projectService.deleteProjectByIdsAndUserId(ids, currentUserManager.getUserId(userKey));
     }
 
     /**
@@ -108,9 +107,9 @@ public class ProjectController {
      * @return
      */
     @RequestMapping("/project/ajax/list")
-    public String ajaxList(HttpServletRequest request, HttpSession session) {
+    public String ajaxList(HttpServletRequest request, @RequestParam String userKey) {
         Project project = new Project();
-        project.setUserId(currentUserManager.getUserId());
+        project.setUserId(currentUserManager.getUserId(userKey));
         request.setAttribute("list", projectService.getProjectList(project));
         return "common/select-item";
     }

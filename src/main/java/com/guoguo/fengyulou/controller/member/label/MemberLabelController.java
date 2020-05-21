@@ -36,9 +36,9 @@ public class MemberLabelController {
      * @return
      */
     @RequestMapping("/memberLabel/list/page")
-    public String list(HttpServletRequest request, HttpSession session, MemberLabel memberLabel) {
+    public String list(HttpServletRequest request, @RequestParam String userKey, MemberLabel memberLabel) {
         request.setAttribute("data", memberLabel);
-        memberLabel.setUserId(currentUserManager.getUserId());
+        memberLabel.setUserId(currentUserManager.getUserId(userKey));
         request.setAttribute("pageInfo", memberLabelService.getMemberLabelListPage(memberLabel));
         return "/member/label/member-label-list";
     }
@@ -64,10 +64,10 @@ public class MemberLabelController {
      * @return
      */
     @RequestMapping("/memberLabel/update")
-    public String update(HttpServletRequest request, HttpSession session, MemberLabel memberLabel) {
+    public String update(HttpServletRequest request, @RequestParam String userKey, MemberLabel memberLabel) {
         request.setAttribute("pageTitle", "修改人员标签");
         // 查询人员标签
-        memberLabel.setUserId(currentUserManager.getUserId());
+        memberLabel.setUserId(currentUserManager.getUserId(userKey));
         request.setAttribute("data", memberLabelService.getMemberLabelByIdAndUserId(memberLabel));
         return "member/label/member-label-save";
     }
@@ -80,11 +80,11 @@ public class MemberLabelController {
      */
     @RequestMapping("/memberLabel/ajax/save")
     @ResponseBody
-    public ServerResponse ajaxSave(MemberLabel memberLabel, HttpSession session) {
+    public ServerResponse ajaxSave(MemberLabel memberLabel, @RequestParam String userKey) {
         if (StringUtils.isBlank(memberLabel.getName())) {
             return ServerResponse.createByErrorMessage("请输入人员标签名称");
         }
-        memberLabel.setUserId(currentUserManager.getUserId());
+        memberLabel.setUserId(currentUserManager.getUserId(userKey));
         return memberLabelService.saveMemberLabel(memberLabel);
     }
 
@@ -96,11 +96,11 @@ public class MemberLabelController {
      */
     @RequestMapping("/memberLabel/ajax/delete")
     @ResponseBody
-    public ServerResponse ajaxDelete(@RequestParam List<Long> ids, HttpSession session) {
+    public ServerResponse ajaxDelete(@RequestParam List<Long> ids, @RequestParam String userKey) {
         if (ObjectUtils.isNull(ids)) {
             return ServerResponse.createByErrorMessage("请选择数据");
         }
-        return memberLabelService.deleteMemberLabelByIdsAndUserId(ids, currentUserManager.getUserId());
+        return memberLabelService.deleteMemberLabelByIdsAndUserId(ids, currentUserManager.getUserId(userKey));
     }
 
     /**
@@ -110,9 +110,9 @@ public class MemberLabelController {
      * @return
      */
     @RequestMapping("/memberLabel/ajax/list")
-    public String ajaxList(HttpServletRequest request, HttpSession session) {
+    public String ajaxList(HttpServletRequest request, @RequestParam String userKey) {
         MemberLabel memberLabel = new MemberLabel();
-        memberLabel.setUserId(currentUserManager.getUserId());
+        memberLabel.setUserId(currentUserManager.getUserId(userKey));
         request.setAttribute("list", memberLabelService.getMemberLabelList(memberLabel));
         return "common/select-item";
     }

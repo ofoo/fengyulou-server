@@ -76,16 +76,16 @@ public class StringUtils {
     }
 
     /**
-     * 获取唯一标记
+     * 获取用户唯一标记
      *
      * @return
      */
-    public static String uuid() {
+    public static String userKey(Long userId) {
         StringBuffer stringBuffer = new StringBuffer(CommonConstant.UUID);
         stringBuffer.append("_");
-        stringBuffer.append(System.currentTimeMillis());
-        stringBuffer.append("_");
         stringBuffer.append(UUID.randomUUID().toString().replace("-", ""));
+        stringBuffer.append("_");
+        stringBuffer.append(userId);
         return stringBuffer.toString();
     }
 

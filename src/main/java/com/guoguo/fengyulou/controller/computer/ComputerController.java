@@ -42,8 +42,8 @@ public class ComputerController {
      * @return
      */
     @RequestMapping("/computer/list/page")
-    public String list(HttpServletRequest request, HttpSession session, Computer computer) {
-        computer.setUserId(currentUserManager.getUserId());
+    public String list(HttpServletRequest request, @RequestParam String userKey, Computer computer) {
+        computer.setUserId(currentUserManager.getUserId(userKey));
         request.setAttribute("pageInfo", computerService.getComputerListPage(computer));
         request.setAttribute("data", computer);
         return "computer/computer-list";
@@ -56,10 +56,10 @@ public class ComputerController {
      * @return
      */
     @RequestMapping("/computer/insert")
-    public String insert(HttpServletRequest request, HttpSession session) {
+    public String insert(HttpServletRequest request, @RequestParam String userKey) {
         request.setAttribute("pageTitle", "添加任务");
         //获取用户id
-        Long userId = currentUserManager.getUserId();
+        Long userId = currentUserManager.getUserId(userKey);
         // 查询项目列表
         Project project = new Project();
         project.setUserId(userId);
@@ -80,10 +80,10 @@ public class ComputerController {
      * @return
      */
     @RequestMapping("/computer/update")
-    public String update(HttpServletRequest request, HttpSession session, Computer computer) {
+    public String update(HttpServletRequest request, @RequestParam String userKey, Computer computer) {
         request.setAttribute("pageTitle", "修改任务");
         //获取用户id
-        Long userId = currentUserManager.getUserId();
+        Long userId = currentUserManager.getUserId(userKey);
         // 查询任务
         computer.setUserId(userId);
         request.setAttribute("data", computerService.getComputerByIdAndUserId(computer));
@@ -106,7 +106,7 @@ public class ComputerController {
      */
     @RequestMapping("/computer/ajax/save")
     @ResponseBody
-    private ServerResponse ajaxSave(HttpSession session, Computer computer) {
+    private ServerResponse ajaxSave(@RequestParam String userKey, Computer computer) {
         if (ObjectUtils.isNull(computer.getProjectId())) {
             return ServerResponse.createByErrorMessage("请选择项目名称");
         }
@@ -122,7 +122,7 @@ public class ComputerController {
         if (StringUtils.isBlank(computer.getPassword())) {
             return ServerResponse.createByErrorMessage("请输入密码");
         }
-        computer.setUserId(currentUserManager.getUserId());
+        computer.setUserId(currentUserManager.getUserId(userKey));
         return computerService.saveComputer(computer);
     }
 
@@ -134,10 +134,10 @@ public class ComputerController {
      */
     @RequestMapping("/computer/ajax/delete")
     @ResponseBody
-    private ServerResponse ajaxDelete(@RequestParam List<Long> ids, HttpSession session) {
+    private ServerResponse ajaxDelete(@RequestParam List<Long> ids, @RequestParam String userKey) {
         if (ObjectUtils.isNull(ids)) {
             return ServerResponse.createByErrorMessage("请选择数据");
         }
-        return computerService.deleteComputerByIdsAndUserId(ids, currentUserManager.getUserId());
+        return computerService.deleteComputerByIdsAndUserId(ids, currentUserManager.getUserId(userKey));
     }
 }

@@ -20,17 +20,15 @@ import javax.servlet.http.HttpServletResponse;
 public class CurrentUserManager {
     @Autowired
     private RedisManager redisManager;
-    @Autowired
-    private HttpServletRequest request;
 
     /**
      * 获取当前登录用户id
      *
      * @return
      */
-    public Long getUserId() {
+    public Long getUserId(String userKey) {
         try {
-            User user = getUser();
+            User user = getUser(userKey);
             if (ObjectUtils.isNotNull(user)) {
                 return user.getId();
             }
@@ -45,9 +43,9 @@ public class CurrentUserManager {
      *
      * @return
      */
-    public User getUser() {
+    public User getUser(String userKey) {
         try {
-            String userJsonStr = redisManager.get(WebUtils.getCookie(request, CommonConstant.UUID));
+            String userJsonStr = redisManager.get(userKey);
             if (StringUtils.isNotBlank(userJsonStr)) {
                 User user = StaticObject.gson.fromJson(userJsonStr, User.class);
                 return user;
@@ -63,9 +61,9 @@ public class CurrentUserManager {
      *
      * @return
      */
-    public boolean verifyLogin() {
+    public boolean verifyLogin(String userKey) {
         try {
-            User user = getUser();
+            User user = getUser(userKey);
             if (ObjectUtils.isNotNull(user)) {
                 return true;
             }
@@ -78,20 +76,18 @@ public class CurrentUserManager {
     /**
      * 用户退出
      */
-    public void logout(HttpServletResponse response) {
-        redisManager.delete(WebUtils.getCookie(request, CommonConstant.UUID));
-        WebUtils.deleteCookie(request, response, CommonConstant.UUID);
+    public void logout(String userKey) {
+        redisManager.delete(userKey);
     }
 
     /**
      * 用户登录
      *
-     * @param response
      * @param user
      */
-    public void login(HttpServletResponse response, User user) {
-        String uuid = StringUtils.uuid();
-        redisManager.setDays(uuid, user, StringUtils.strTurnLong(TimeConstant.NUMBER_ONE));
-        WebUtils.setCookie(response, CommonConstant.UUID, uuid, StringUtils.strTurnInt(TimeConstant.NUMBER_ONE));
+    public String login(User user) {
+        String userKey = StringUtils.userKey(user.getId());
+        redisManager.setDays(userKey, user, StringUtils.strTurnLong(TimeConstant.NUMBER_ONE));
+        return userKey;
     }
 }
