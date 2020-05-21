@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.guoguo.fengyulou.dao.member.MemberDao">
+    <insert id="insertMember" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into fengyulou_member(`name`,member_label_id,mobile,user_id) values (#{name},#{memberLabelId},#{mobile},#{userId})
+    </insert>
+    <update id="updateMemberByIdAndUserId">
+        update fengyulou_member set `name`=#{name},member_label_id=#{memberLabelId},mobile=#{mobile} where id=#{id} and user_id=#{userId}
+    </update>
+    <update id="deleteMemberByIdsAndUserId">
+        update fengyulou_member set `delete`=1 where id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and user_id=#{userId}
+    </update>
+
+    <select id="getMemberList" resultType="com.guoguo.fengyulou.entity.member.Member">
+        select
+        fengyulou_member.id,
+        fengyulou_member.`name`,
+        fengyulou_member.mobile,
+        fengyulou_member_label.name memberLabelName
+        from fengyulou_member
+        left join fengyulou_member_label on fengyulou_member.member_label_id=fengyulou_member_label.id
+        <where>
+            fengyulou_member.`delete`=0
+            and fengyulou_member.user_id=#{userId}
+            <if test="name!=null and name!=''">
+                and fengyulou_member.`name` like CONCAT('%',#{name},'%')
+            </if>
+            <if test="memberLabelName!=null and memberLabelName!=''">
+                and fengyulou_member_label.`name` like CONCAT('%',#{memberLabelName},'%')
+            </if>
+            <if test="mobile!=null and mobile!=''">
+                and fengyulou_member.`mobile` like CONCAT('%',#{mobile},'%')
+            </if>
+        </where>
+        order by fengyulou_member.id desc
+    </select>
+    <select id="getMemberCountByMember" resultType="java.lang.Integer">
+        select ifnull(count(1),0) from fengyulou_member where mobile=#{mobile} and user_id=#{userId} and id!=#{id}
+    </select>
+    <select id="getMemberCountByMobileAndUserId" resultType="java.lang.Integer">
+        select ifnull(count(1),0) from fengyulou_member where mobile=#{mobile} and user_id=#{userId}
+    </select>
+    <select id="getMemberByIdAndUserId" resultType="com.guoguo.fengyulou.entity.member.Member">
+        select id,`name`,member_label_id,mobile from fengyulou_member where id=#{id} and user_id=#{userId} limit 1
+    </select>
+</mapper>

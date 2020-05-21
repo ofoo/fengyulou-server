@@ -1,0 +1,100 @@
+.admin .admin-left, .admin .admin-right {
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+}
+
+.admin-left {
+    width: 15%;
+    border-right: 1px solid #ddd;
+    text-align: center;
+}
+
+.admin-left .logo {
+    padding: 10px;
+}
+
+.admin-left .logo img {
+    width: 150px;
+    height: 150px;
+}
+
+.admin-left .logo h1 {
+    margin-bottom: 20px;
+}
+
+.admin-right {
+    width: 85%;
+    left: 15%;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+.search-from {
+    margin-bottom: 20px;
+}
+
+.fun-btn {
+    margin-bottom: 20px;
+}
+
+.data-page {
+    /*position: absolute;*/
+    /*right: 0;*/
+    /*padding-right: 20px;*/
+    margin: 0;
+}
+
+.container-fluid, .container {
+    /*padding-top: 5%;*/
+    /*padding-bottom: 5%;*/
+}
+
+.panel {
+    margin-top: 100px;
+}
+
+.panel .panel-body {
+    padding: 0 15px 15px;
+}
+
+.page-header {
+    border-bottom: 2px solid #337ab7;
+}
+
+.exit {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+}
+
+.login {
+    margin: 100px auto;
+    width: 450px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 0 30px 40px;
+}
+
+.login .page-header,.login .form-group{
+    margin-bottom: 25px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+.glyphicon{
+    /*margin-left: 10px;*/
+    margin-right: 10px;
+}
+.data-form{
+    margin-top: 5%;
+}
+.mb20{
+    margin-bottom: 20px;
+}

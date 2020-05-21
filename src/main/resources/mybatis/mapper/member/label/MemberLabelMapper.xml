@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.guoguo.fengyulou.dao.member.label.MemberLabelDao">
+    <insert id="insertMemberLabel" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into fengyulou_member_label(`name`,user_id) values (#{name},#{userId})
+    </insert>
+    <update id="updateMemberLabelByIdAndUserId">
+        update fengyulou_member_label set `name`=#{name} where id=#{id} and user_id=#{userId}
+    </update>
+    <update id="deleteMemberLabelByIdsAndUserId">
+        update fengyulou_member_label set `delete`=1 where id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and user_id=#{userId}
+    </update>
+
+    <select id="getMemberLabelList" resultType="com.guoguo.fengyulou.entity.member.label.MemberLabel">
+        select id,`name` from fengyulou_member_label
+        <where>
+            `delete`=0
+            and user_id=#{userId}
+            <if test="name!=null and name!=''">
+                and `name` like concat('%',#{name},'%')
+            </if>
+        </where>
+        order by id desc
+    </select>
+    <select id="getMemberLabelCountByMemberLabel" resultType="java.lang.Integer">
+        select ifnull(count(1),0) from fengyulou_member_label where `name`=#{name} and user_id=#{userId} and id!=#{id}
+    </select>
+    <select id="getMemberLabelByIdAndUserId" resultType="com.guoguo.fengyulou.entity.member.label.MemberLabel">
+        select id,`name` from fengyulou_member_label where id=#{id} and user_id=#{userId} limit 1
+    </select>
+    <select id="getMemberLabelCountByNameByUserId" resultType="java.lang.Integer">
+        select ifnull(count(1),0) from fengyulou_member_label where `name`=#{name} and user_id=#{userId}
+    </select>
+</mapper>

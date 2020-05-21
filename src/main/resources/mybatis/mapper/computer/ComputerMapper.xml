@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.guoguo.fengyulou.dao.computer.ComputerDao">
+    <insert id="insertComputer" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into fengyulou_computer(project_id, host, port, account,password,user_id,add_time,update_time) values (#{projectId},#{host},#{port},#{account},#{password},#{userId},now(),now())
+    </insert>
+    <update id="updateComputerByIdAndUserId">
+        update fengyulou_computer set
+        project_id=#{projectId},
+        host=#{host},
+        port=#{port},
+        account=#{account},
+        password=#{password},
+        update_time=now()
+        where id=#{id}
+        and user_id=#{userId}
+    </update>
+    <update id="deleteComputerByIdsAndUserId">
+        update fengyulou_computer set `delete`=1 where id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and user_id=#{userId}
+    </update>
+
+    <select id="getComputerList" resultType="com.guoguo.fengyulou.entity.computer.Computer">
+        select
+        fengyulou_computer.id,
+        fengyulou_project.name projectName,
+        fengyulou_computer.host,
+        fengyulou_computer.port,
+        fengyulou_computer.account,
+        fengyulou_computer.password
+        from fengyulou_computer
+        left join fengyulou_project on fengyulou_computer.project_id=fengyulou_project.id
+        <where>
+            fengyulou_computer.`delete`=0
+            and fengyulou_computer.user_id=#{userId}
+            <if test="projectName!=null and projectName!=''">
+                and fengyulou_project.name like CONCAT('%',#{projectName},'%')
+            </if>
+        </where>
+        order by fengyulou_computer.id desc
+    </select>
+    <select id="getComputerById" resultType="com.guoguo.fengyulou.entity.computer.Computer">
+        select
+        fengyulou_computer.id,
+        fengyulou_computer.project_id,
+        fengyulou_computer.host,
+        fengyulou_computer.port,
+        fengyulou_computer.account,
+        fengyulou_computer.password
+        from fengyulou_computer
+        where id=#{id}
+        limit 1
+    </select>
+    <select id="getComputerByIdAndUserId" resultType="com.guoguo.fengyulou.entity.computer.Computer">
+        select
+        fengyulou_computer.id,
+        fengyulou_computer.project_id,
+        fengyulou_computer.host,
+        fengyulou_computer.port,
+        fengyulou_computer.account,
+        fengyulou_computer.password
+        from fengyulou_computer
+        where id=#{id}
+        and user_id=#{userId}
+        limit 1
+    </select>
+    <select id="getComputerCountByNameAndUserId" resultType="java.lang.Integer">
+        select ifnull(count(1),0) from fengyulou_computer where `host`=#{host} and user_id=#{userId}
+    </select>
+</mapper>

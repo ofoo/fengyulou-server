@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.guoguo.fengyulou.dao.task.TaskDao">
+    <insert id="insertTask" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into fengyulou_task(project_id, sketch, task_label_id, member_id,user_id,<include refid="CommonMapper.insertTimeColumn"/>) values (#{projectId},#{sketch},#{taskLabelId},#{memberId},#{userId},<include refid="CommonMapper.currentTime"/>)
+    </insert>
+    <update id="updateTaskByIdAndUserId">
+        update fengyulou_task set
+        project_id=#{projectId},
+        sketch=#{sketch},
+        task_label_id=#{taskLabelId},
+        status=#{status},
+        <if test="status==0">finish_time=null,</if>
+        <if test="status==1">finish_time=now(),</if>
+        member_id=#{memberId},
+        <include refid="CommonMapper.updateTime"/>
+        where id=#{id}
+        and user_id=#{userId}
+    </update>
+    <update id="deleteTaskByIdsAndUserId">
+        update fengyulou_task set `delete`=1,<include refid="CommonMapper.deleteTime"/> where id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and user_id=#{userId}
+    </update>
+    <update id="updateStatusByIdsAndUserId">
+        update fengyulou_task set `status`=1,finish_time=now() where id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and user_id=#{userId}
+    </update>
+
+    <select id="getTaskList" resultType="com.guoguo.fengyulou.entity.task.Task">
+        select
+        fengyulou_task.id,
+        fengyulou_project.name projectName,
+        fengyulou_task.sketch,
+        fengyulou_task_label.name taskLabelName,
+        fengyulou_task.status,
+        fengyulou_task.finish_time,
+        fengyulou_member.name memberName
+        from fengyulou_task
+        left join fengyulou_project on fengyulou_task.project_id=fengyulou_project.id
+        left join fengyulou_task_label on fengyulou_task.task_label_id=fengyulou_task_label.id
+        left join fengyulou_member on fengyulou_task.member_id=fengyulou_member.id
+        <where>
+            fengyulou_task.`delete`=0
+            and fengyulou_task.user_id=#{userId}
+            <if test="projectName!=null and projectName!=''">
+                and fengyulou_project.name like CONCAT('%',#{projectName},'%')
+            </if>
+            <if test="sketch!=null and sketch!=''">
+                and fengyulou_task.sketch like CONCAT('%',#{sketch},'%')
+            </if>
+            <if test="status!=null and status>-1">
+                and fengyulou_task.status=#{status}
+            </if>
+            <if test="taskLabelName!=null and taskLabelName!=null">
+                and fengyulou_task_label.name like CONCAT('%',#{taskLabelName},'%')
+            </if>
+            <if test="memberName!=null and memberName!=null">
+                and fengyulou_member.name like CONCAT('%',#{memberName},'%')
+            </if>
+            <if test="finishTime!=null">
+                and fengyulou_task.finish_time=#{finishTime}
+            </if>
+        </where>
+        order by fengyulou_task.status,fengyulou_task.id desc
+    </select>
+    <select id="getTaskByIdAndUserId" resultType="com.guoguo.fengyulou.entity.task.Task">
+        select
+        fengyulou_task.id,
+        fengyulou_task.project_id,
+        fengyulou_task.sketch,
+        fengyulou_task.task_label_id,
+        fengyulou_task.status,
+        fengyulou_task.finish_time,
+        fengyulou_task.member_id
+        from fengyulou_task
+        where id=#{id}
+        and user_id=#{userId}
+        limit 1
+    </select>
+</mapper>

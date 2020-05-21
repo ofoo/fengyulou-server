@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.guoguo.fengyulou.dao.user.UserDao">
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into fengyulou_user(login_name,password,`name`) value(#{loginName},#{password},#{name})
+    </insert>
+    <update id="updatePasswordById">
+        update fengyulou_user set password=#{password} where id=#{id}
+    </update>
+    <update id="updateUserById">
+        update fengyulou_user set login_name=#{loginName}<if test="password!=null and password!=''">
+        ,password=#{password}</if>,`name`=#{name} where id=#{id}
+    </update>
+    <update id="deleteUserByIds">
+        update fengyulou_user set `delete`=1 where id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="getUserByLoginName" resultType="com.guoguo.fengyulou.entity.user.User">
+        select id,login_name,password,`name`,`type` from fengyulou_user where login_name=#{loginName} and `delete`=0
+    </select>
+    <select id="getUserList" resultType="com.guoguo.fengyulou.entity.user.User">
+        select
+        id,
+        login_name,
+        `name`
+        from fengyulou_user
+        <where>
+            `delete`=0
+            <if test="loginName!=null and loginName!=''">
+                and login_name like concat('%',#{loginName},'%')
+            </if>
+            <if test="name!=null and name!=''">
+                and `name` like concat('%',#{name},'%')
+            </if>
+        </where>
+        order by id desc
+    </select>
+    <select id="getUserById" resultType="com.guoguo.fengyulou.entity.user.User">
+        select id,login_name,`name` from fengyulou_user where id=#{id} limit 1
+    </select>
+    <select id="getUserCountByProject" resultType="java.lang.Integer">
+        select ifnull(count(1),0) from fengyulou_user where login_name=#{loginName} and id!=#{id}
+    </select>
+    <select id="getUserCountByLoginName" resultType="java.lang.Integer">
+        select ifnull(count(1),0) from fengyulou_user where login_name=#{loginName}
+    </select>
+</mapper>
