@@ -26,7 +26,7 @@ public class ComputerServiceImpl implements ComputerService {
 
     @Override
     public PageInfo<Computer> getComputerListPage(Computer computer) {
-        PageHelper.startPage(computer.getPageNum() == null ? 1 : computer.getPageNum(), computer.getPageSize() == null ? 10 : computer.getPageSize());
+        PageHelper.startPage(computer.getPage(),computer.getLimit());
         List<Computer> list = computerDao.getComputerList(computer);
         PageInfo<Computer> pageInfo = new PageInfo<>(list);
         return pageInfo;

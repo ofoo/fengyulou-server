@@ -11,10 +11,10 @@ import com.guoguo.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * 人员管理
  */
-@Controller
+@RestController
 @RequestMapping("/fyl")
 public class MemberController {
 
@@ -49,57 +49,13 @@ public class MemberController {
     }
 
     /**
-     * 添加页面
-     *
-     * @param request
-     * @return
-     */
-    @RequestMapping("/member/insert")
-    public String insert(HttpServletRequest request, @RequestParam String userKey) {
-        request.setAttribute("pageTitle", "添加人员");
-        // 查询人员标签列表
-        MemberLabel memberLabel = new MemberLabel();
-        memberLabel.setUserId(currentUserManager.getUserId(userKey));
-        request.setAttribute("memberLabelList", memberLabelService.getMemberLabelList(memberLabel));
-        // task=任务页面打开
-        String str = request.getParameter("str");
-        logger.info("str={}", str);
-        request.setAttribute("str", str);
-        return "member/member-save";
-    }
-
-    /**
-     * 修改页面
-     *
-     * @param request
-     * @param session
-     * @param member
-     * @return
-     */
-    @RequestMapping("/member/update")
-    public String update(HttpServletRequest request, @RequestParam String userKey, Member member) {
-        request.setAttribute("pageTitle", "修改人员");
-        //获取用户id
-        Long userId = currentUserManager.getUserId(userKey);
-        // 查询人员
-        member.setUserId(userId);
-        request.setAttribute("data", memberService.getMemberByIdAndUserId(member));
-        // 查询人员标签列表
-        MemberLabel memberLabel = new MemberLabel();
-        memberLabel.setUserId(userId);
-        request.setAttribute("memberLabelList", memberLabelService.getMemberLabelList(memberLabel));
-        return "member/member-save";
-    }
-
-    /**
      * 保存数据
      *
      * @param member
      * @return
      */
-    @RequestMapping("/member/ajax/save")
-    @ResponseBody
-    public ServerResponse ajaxSave(Member member, @RequestParam String userKey) {
+    @RequestMapping("/member/save")
+    public ServerResponse save(Member member, @RequestParam String userKey) {
         if (StringUtils.isBlank(member.getName())) {
             return ServerResponse.createByErrorMessage("请输入人员名称");
         }
@@ -128,14 +84,13 @@ public class MemberController {
     /**
      * 下拉选列表
      *
-     * @param request
+     * @param userKey
      * @return
      */
-    @RequestMapping("/member/ajax/list")
-    public String ajaxList(HttpServletRequest request, @RequestParam String userKey) {
+    @RequestMapping("/member/list/content")
+    public ServerResponse listContent(@RequestParam String userKey) {
         Member member = new Member();
         member.setUserId(currentUserManager.getUserId(userKey));
-        request.setAttribute("list", memberService.getMemberList(member));
-        return "common/select-item";
+        return ServerResponse.createBySuccess(memberService.getMemberList(member));
     }
 }

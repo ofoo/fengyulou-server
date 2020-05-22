@@ -39,10 +39,10 @@
         order by fengyulou_member.id desc
     </select>
     <select id="getMemberCountByMember" resultType="java.lang.Integer">
-        select ifnull(count(1),0) from fengyulou_member where mobile=#{mobile} and user_id=#{userId} and id!=#{id}
+        select ifnull(count(1),0) from fengyulou_member where `name`=#{name} and user_id=#{userId} and id!=#{id}
     </select>
     <select id="getMemberCountByMobileAndUserId" resultType="java.lang.Integer">
-        select ifnull(count(1),0) from fengyulou_member where mobile=#{mobile} and user_id=#{userId}
+        select ifnull(count(1),0) from fengyulou_member where `name`=#{name} and user_id=#{userId}
     </select>
     <select id="getMemberByIdAndUserId" resultType="com.guoguo.fengyulou.entity.member.Member">
         select id,`name`,member_label_id,mobile from fengyulou_member where id=#{id} and user_id=#{userId} limit 1

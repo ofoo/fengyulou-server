@@ -29,9 +29,9 @@ public class BaseEntity implements Serializable {
     /**
      * 页码
      */
-    private Integer pageNum;
+    private Integer page;
     /**
      * 每页条数
      */
-    private Integer pageSize;
+    private Integer limit;
 }

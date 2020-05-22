@@ -33,7 +33,6 @@ public class LoginVerifyInterceptor implements HandlerInterceptor {
             response.sendRedirect(CommonConstant.LOGIN);
             return false;
         }
-        request.setAttribute(CommonConstant.CUR_USER, user);
         return true;
     }
 

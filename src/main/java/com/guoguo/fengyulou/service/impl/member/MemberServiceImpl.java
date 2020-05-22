@@ -27,7 +27,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public PageInfo<Member> getMemberListPage(Member member) {
-        PageHelper.startPage(member.getPageNum() == null ? 1 : member.getPageNum(), member.getPageSize() == null ? 10 : member.getPageSize());
+        PageHelper.startPage(member.getPage(), member.getLimit());
         List<Member> list = memberDao.getMemberList(member);
         PageInfo<Member> pageInfo = new PageInfo<>(list);
         return pageInfo;
@@ -37,7 +37,7 @@ public class MemberServiceImpl implements MemberService {
     public ServerResponse saveMember(Member member) {
         // 去除空格
         member.setName(member.getName().trim());
-        member.setMobile(member.getMobile().trim());
+//        member.setMobile(member.getMobile().trim());
         if (ObjectUtils.isNotNull(member.getId())) {
             if (StringUtils.isNotBlank(member.getMobile())) {
                 // 验证数据是否重复

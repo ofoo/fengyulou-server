@@ -25,7 +25,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public PageInfo<Task> getTaskListPage(Task task) {
-        PageHelper.startPage(task.getPageNum() == null ? 1 : task.getPageNum(), task.getPageSize() == null ? 10 : task.getPageSize());
+        PageHelper.startPage(task.getPage(), task.getLimit());
         List<Task> list = taskDao.getTaskList(task);
         PageInfo<Task> pageInfo = new PageInfo<>(list);
         return pageInfo;

@@ -26,7 +26,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public PageInfo<Project> getProjectListPage(Project project) {
-        PageHelper.startPage(project.getPageNum() == null ? 1 : project.getPageNum(), project.getPageSize() == null ? 10 : project.getPageSize());
+        PageHelper.startPage(project.getPage(), project.getLimit());
         List<Project> list = projectDao.getProjectList(project);
         PageInfo<Project> pageInfo = new PageInfo<>(list);
         return pageInfo;

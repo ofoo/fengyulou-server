@@ -39,8 +39,12 @@
         fengyulou_task.sketch,
         fengyulou_task_label.name taskLabelName,
         fengyulou_task.status,
+        IF(fengyulou_task.status>0,'已完成','未完成') statusName,
         fengyulou_task.finish_time,
-        fengyulou_member.name memberName
+        fengyulou_member.name memberName,
+        fengyulou_task.project_id,
+        fengyulou_task.task_label_id,
+        fengyulou_task.member_id
         from fengyulou_task
         left join fengyulou_project on fengyulou_task.project_id=fengyulou_project.id
         left join fengyulou_task_label on fengyulou_task.task_label_id=fengyulou_task_label.id
@@ -57,10 +61,10 @@
             <if test="status!=null and status>-1">
                 and fengyulou_task.status=#{status}
             </if>
-            <if test="taskLabelName!=null and taskLabelName!=null">
+            <if test="taskLabelName!=null and taskLabelName!=''">
                 and fengyulou_task_label.name like CONCAT('%',#{taskLabelName},'%')
             </if>
-            <if test="memberName!=null and memberName!=null">
+            <if test="memberName!=null and memberName!=''">
                 and fengyulou_member.name like CONCAT('%',#{memberName},'%')
             </if>
             <if test="finishTime!=null">
@@ -76,6 +80,7 @@
         fengyulou_task.sketch,
         fengyulou_task.task_label_id,
         fengyulou_task.status,
+        IF(fengyulou_task.status>0,'已完成','未完成') statusName,
         fengyulou_task.finish_time,
         fengyulou_task.member_id
         from fengyulou_task

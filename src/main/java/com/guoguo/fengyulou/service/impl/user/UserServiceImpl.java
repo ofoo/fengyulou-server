@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public PageInfo<User> getUserListPage(User user) {
-        PageHelper.startPage(user.getPageNum() == null ? 1 : user.getPageNum(), user.getPageSize() == null ? 10 : user.getPageSize());
+        PageHelper.startPage(user.getPage(), user.getLimit());
         List<User> list = userDao.getUserList(user);
         PageInfo<User> pageInfo = new PageInfo<>(list);
         return pageInfo;

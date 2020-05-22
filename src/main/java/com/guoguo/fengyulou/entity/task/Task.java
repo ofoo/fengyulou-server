@@ -54,5 +54,8 @@ public class Task extends BaseEntity {
      * 人员姓名
      */
     private String memberName;
-
+    /**
+     * 状态名称
+     */
+    private String statusName;
 }

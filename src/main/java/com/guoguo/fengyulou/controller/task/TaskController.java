@@ -4,25 +4,19 @@ import com.github.pagehelper.PageInfo;
 import com.guoguo.common.CurrentUserManager;
 import com.guoguo.common.DataJson;
 import com.guoguo.common.ServerResponse;
-import com.guoguo.fengyulou.entity.member.Member;
-import com.guoguo.fengyulou.entity.project.Project;
 import com.guoguo.fengyulou.entity.task.Task;
-import com.guoguo.fengyulou.entity.task.label.TaskLabel;
 import com.guoguo.fengyulou.service.member.MemberService;
 import com.guoguo.fengyulou.service.project.ProjectService;
 import com.guoguo.fengyulou.service.task.TaskService;
 import com.guoguo.fengyulou.service.task.label.TaskLabelService;
 import com.guoguo.util.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.guoguo.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -50,66 +44,15 @@ public class TaskController {
      */
     @RequestMapping("/task/list")
     public DataJson list(Task task, @RequestParam String userKey) {
+        //存放用户id
         task.setUserId(currentUserManager.getUserId(userKey));
+        //去除参数空格
+        task.setProjectName(StringUtils.isNotBlank(task.getProjectName()) ? task.getProjectName().trim() : null);
+        task.setMemberName(StringUtils.isNotBlank(task.getMemberName()) ? task.getMemberName().trim() : null);
+        task.setTaskLabelName(StringUtils.isNotBlank(task.getTaskLabelName()) ? task.getTaskLabelName().trim() : null);
+        //查询数据
         PageInfo<Task> pageInfo = taskService.getTaskListPage(task);
         return DataJson.list(pageInfo.getTotal(), pageInfo.getList());
-    }
-
-    /**
-     * 添加页面
-     *
-     * @param request
-     * @return
-     */
-    @RequestMapping("/task/insert")
-    public String insert(HttpServletRequest request, @RequestParam String userKey) {
-        request.setAttribute("pageTitle", "添加任务");
-        //获取用户id
-        Long userId = currentUserManager.getUserId(userKey);
-        // 查询项目列表
-        Project project = new Project();
-        project.setUserId(userId);
-        request.setAttribute("projectList", projectService.getProjectList(project));
-        // 查询任务标签列表
-        TaskLabel taskLabel = new TaskLabel();
-        taskLabel.setUserId(userId);
-        request.setAttribute("taskLabelList", taskLabelService.getTaskLabelList(taskLabel));
-        // 查询人员列表
-        Member member = new Member();
-        member.setUserId(userId);
-        request.setAttribute("memberList", memberService.getMemberList(member));
-        return "task/task-save";
-    }
-
-    /**
-     * 修改页面
-     *
-     * @param request
-     * @param session
-     * @param task
-     * @return
-     */
-    @RequestMapping("/task/update")
-    public String update(HttpServletRequest request, @RequestParam String userKey, Task task) {
-        request.setAttribute("pageTitle", "修改任务");
-        //获取用户id
-        Long userId = currentUserManager.getUserId(userKey);
-        // 查询任务
-        task.setUserId(userId);
-        request.setAttribute("data", taskService.getTaskByIdAndUserId(task));
-        // 查询项目列表
-        Project project = new Project();
-        project.setUserId(userId);
-        request.setAttribute("projectList", projectService.getProjectList(project));
-        // 查询任务标签列表
-        TaskLabel taskLabel = new TaskLabel();
-        taskLabel.setUserId(userId);
-        request.setAttribute("taskLabelList", taskLabelService.getTaskLabelList(taskLabel));
-        // 查询人员列表
-        Member member = new Member();
-        member.setUserId(userId);
-        request.setAttribute("memberList", memberService.getMemberList(member));
-        return "task/task-save";
     }
 
     /**
@@ -118,9 +61,8 @@ public class TaskController {
      * @param task
      * @return
      */
-    @RequestMapping("/task/ajax/save")
-    @ResponseBody
-    private ServerResponse ajaxSave(@RequestParam String userKey, Task task) {
+    @RequestMapping("/task/save")
+    public ServerResponse save(@RequestParam String userKey, Task task) {
         if (StringUtils.isBlank(task.getSketch())) {
             return ServerResponse.createByErrorMessage("请输入任务简述");
         }
@@ -146,9 +88,8 @@ public class TaskController {
      * @param ids
      * @return
      */
-    @RequestMapping("/task/ajax/delete")
-    @ResponseBody
-    private ServerResponse ajaxDelete(@RequestParam List<Long> ids, @RequestParam String userKey) {
+    @RequestMapping("/task/delete")
+    public ServerResponse delete(@RequestParam List<Long> ids, @RequestParam String userKey) {
         if (ObjectUtils.isNull(ids)) {
             return ServerResponse.createByErrorMessage("请选择数据");
         }
@@ -160,7 +101,7 @@ public class TaskController {
      */
     @RequestMapping("/task/ajax/updateStatus")
     @ResponseBody
-    private ServerResponse ajaxUpdateStatus(@RequestParam List<Long> ids, @RequestParam String userKey) {
+    public ServerResponse ajaxUpdateStatus(@RequestParam List<Long> ids, @RequestParam String userKey) {
         return taskService.updateStatusByIdsAndUserId(ids, currentUserManager.getUserId(userKey));
     }
 }

@@ -7,10 +7,10 @@ import com.guoguo.fengyulou.service.project.ProjectService;
 import com.guoguo.util.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * 项目管理
  */
-@Controller
+@RestController
 @RequestMapping("/fyl")
 public class ProjectController {
 
@@ -75,9 +75,8 @@ public class ProjectController {
      * @param project
      * @return
      */
-    @RequestMapping("/project/ajax/save")
-    @ResponseBody
-    public ServerResponse ajaxSave(Project project, @RequestParam String userKey) {
+    @RequestMapping("/project/save")
+    public ServerResponse save(Project project, @RequestParam String userKey) {
         if (StringUtils.isBlank(project.getName())) {
             return ServerResponse.createByErrorMessage("请输入项目名称");
         }
@@ -103,14 +102,13 @@ public class ProjectController {
     /**
      * 下拉选列表
      *
-     * @param request
+     * @param userKey
      * @return
      */
-    @RequestMapping("/project/ajax/list")
-    public String ajaxList(HttpServletRequest request, @RequestParam String userKey) {
+    @RequestMapping("/project/list/content")
+    public ServerResponse listContent(@RequestParam String userKey) {
         Project project = new Project();
         project.setUserId(currentUserManager.getUserId(userKey));
-        request.setAttribute("list", projectService.getProjectList(project));
-        return "common/select-item";
+        return ServerResponse.createBySuccess(projectService.getProjectList(project));
     }
 }

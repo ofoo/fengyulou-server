@@ -7,19 +7,18 @@ import com.guoguo.fengyulou.service.task.label.TaskLabelService;
 import com.guoguo.util.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
  * 任务标签标签管理
  */
-@Controller
+@RestController
 @RequestMapping("/fyl")
 public class TaskLabelController {
 
@@ -44,43 +43,13 @@ public class TaskLabelController {
     }
 
     /**
-     * 添加页面
-     *
-     * @param request
-     * @return
-     */
-    @RequestMapping("/taskLabel/insert")
-    public String insert(HttpServletRequest request, HttpSession session) {
-        request.setAttribute("pageTitle", "添加任务标签");
-        return "task/label/task-label-save";
-    }
-
-    /**
-     * 修改页面
-     *
-     * @param request
-     * @param session
-     * @param taskLabel
-     * @return
-     */
-    @RequestMapping("/taskLabel/update")
-    public String update(HttpServletRequest request, @RequestParam String userKey, TaskLabel taskLabel) {
-        request.setAttribute("pageTitle", "修改任务标签");
-        // 查询任务标签
-        taskLabel.setUserId(currentUserManager.getUserId(userKey));
-        request.setAttribute("data", taskLabelService.getTaskLabelByIdAndUserId(taskLabel));
-        return "task/label/task-label-save";
-    }
-
-    /**
      * 保存数据
      *
      * @param taskLabel
      * @return
      */
-    @RequestMapping("/taskLabel/ajax/save")
-    @ResponseBody
-    public ServerResponse ajaxSave(TaskLabel taskLabel, @RequestParam String userKey) {
+    @RequestMapping("/taskLabel/save")
+    public ServerResponse save(TaskLabel taskLabel, @RequestParam String userKey) {
         if (StringUtils.isBlank(taskLabel.getName())) {
             return ServerResponse.createByErrorMessage("请输入任务标签名称");
         }
@@ -108,12 +77,11 @@ public class TaskLabelController {
      *
      * @return
      */
-    @RequestMapping("/taskLabel/ajax/list")
-    public String ajaxList(HttpServletRequest request, @RequestParam String userKey) {
+    @RequestMapping("/taskLabel/list/content")
+    public ServerResponse listContent(@RequestParam String userKey) {
         TaskLabel taskLabel = new TaskLabel();
         taskLabel.setUserId(currentUserManager.getUserId(userKey));
-        request.setAttribute("list", taskLabelService.getTaskLabelList(taskLabel));
-        return "/common/select-item";
+        return ServerResponse.createBySuccess(taskLabelService.getTaskLabelList(taskLabel));
     }
 }
 

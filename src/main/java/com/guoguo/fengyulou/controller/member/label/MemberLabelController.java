@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -19,7 +20,7 @@ import java.util.List;
 /**
  * 人员标签管理
  */
-@Controller
+@RestController
 @RequestMapping("/fyl")
 public class MemberLabelController {
 
@@ -78,9 +79,8 @@ public class MemberLabelController {
      * @param memberLabel
      * @return
      */
-    @RequestMapping("/memberLabel/ajax/save")
-    @ResponseBody
-    public ServerResponse ajaxSave(MemberLabel memberLabel, @RequestParam String userKey) {
+    @RequestMapping("/memberLabel/save")
+    public ServerResponse save(MemberLabel memberLabel, @RequestParam String userKey) {
         if (StringUtils.isBlank(memberLabel.getName())) {
             return ServerResponse.createByErrorMessage("请输入人员标签名称");
         }
@@ -106,14 +106,13 @@ public class MemberLabelController {
     /**
      * 下拉选列表
      *
-     * @param request
+     * @param userKey
      * @return
      */
-    @RequestMapping("/memberLabel/ajax/list")
-    public String ajaxList(HttpServletRequest request, @RequestParam String userKey) {
+    @RequestMapping("/memberLabel/list/content")
+    public ServerResponse listContent(@RequestParam String userKey) {
         MemberLabel memberLabel = new MemberLabel();
         memberLabel.setUserId(currentUserManager.getUserId(userKey));
-        request.setAttribute("list", memberLabelService.getMemberLabelList(memberLabel));
-        return "common/select-item";
+        return ServerResponse.createBySuccess(memberLabelService.getMemberLabelList(memberLabel));
     }
 }

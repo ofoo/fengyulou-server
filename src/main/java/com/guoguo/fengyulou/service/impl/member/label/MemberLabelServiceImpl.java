@@ -26,7 +26,7 @@ public class MemberLabelServiceImpl implements MemberLabelService {
 
     @Override
     public PageInfo<MemberLabel> getMemberLabelListPage(MemberLabel memberLabel) {
-        PageHelper.startPage(memberLabel.getPageNum() == null ? 1 : memberLabel.getPageNum(), memberLabel.getPageSize() == null ? 10 : memberLabel.getPageSize());
+        PageHelper.startPage(memberLabel.getPage(), memberLabel.getLimit());
         List<MemberLabel> list = memberLabelDao.getMemberLabelList(memberLabel);
         PageInfo<MemberLabel> pageInfo = new PageInfo<>(list);
         return pageInfo;
