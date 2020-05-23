@@ -1,22 +1,18 @@
 package com.guoguo.fengyulou.controller.member;
 
+import com.github.pagehelper.PageInfo;
 import com.guoguo.common.CurrentUserManager;
+import com.guoguo.common.DataJson;
 import com.guoguo.common.ServerResponse;
 import com.guoguo.fengyulou.entity.member.Member;
-import com.guoguo.fengyulou.entity.member.label.MemberLabel;
 import com.guoguo.fengyulou.service.member.MemberService;
-import com.guoguo.fengyulou.service.member.label.MemberLabelService;
 import com.guoguo.util.ObjectUtils;
 import com.guoguo.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -26,12 +22,8 @@ import java.util.List;
 @RequestMapping("/fyl")
 public class MemberController {
 
-    private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
-
     @Autowired
     private MemberService memberService;
-    @Autowired
-    private MemberLabelService memberLabelService;
     @Autowired
     private CurrentUserManager currentUserManager;
 
@@ -40,12 +32,11 @@ public class MemberController {
      *
      * @return
      */
-    @RequestMapping("/member/list/page")
-    public String list(HttpServletRequest request, @RequestParam String userKey, Member member) {
-        request.setAttribute("data", member);
+    @RequestMapping("/member/list")
+    public DataJson list(@RequestParam String userKey, Member member) {
         member.setUserId(currentUserManager.getUserId(userKey));
-        request.setAttribute("pageInfo", memberService.getMemberListPage(member));
-        return "/member/member-list";
+        PageInfo<Member> pageInfo = memberService.getMemberListPage(member);
+        return DataJson.list(pageInfo.getTotal(), pageInfo.getList());
     }
 
     /**
@@ -72,9 +63,8 @@ public class MemberController {
      * @param ids
      * @return
      */
-    @RequestMapping("/member/ajax/delete")
-    @ResponseBody
-    public ServerResponse ajaxDelete(@RequestParam List<Long> ids, @RequestParam String userKey) {
+    @RequestMapping("/member/delete")
+    public ServerResponse delete(@RequestParam List<Long> ids, @RequestParam String userKey) {
         if (ObjectUtils.isNull(ids)) {
             return ServerResponse.createByErrorMessage("请选择数据");
         }

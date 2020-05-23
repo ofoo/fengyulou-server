@@ -2,17 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.guoguo.fengyulou.dao.user.UserDao">
     <insert id="insertUser" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        insert into fengyulou_user(login_name,password,`name`) value(#{loginName},#{password},#{name})
+        insert into fengyulou_user(login_name,password,`name`,insert_time) value(#{loginName},#{password},#{name},now())
     </insert>
     <update id="updatePasswordById">
-        update fengyulou_user set password=#{password} where id=#{id}
+        update fengyulou_user set password=#{password},update_time=now() where id=#{id}
     </update>
     <update id="updateUserById">
         update fengyulou_user set login_name=#{loginName}<if test="password!=null and password!=''">
-        ,password=#{password}</if>,`name`=#{name} where id=#{id}
+        ,password=#{password}</if>,`name`=#{name},update_time=now() where id=#{id}
     </update>
     <update id="deleteUserByIds">
-        update fengyulou_user set `delete`=1 where id in
+        update fengyulou_user set `delete`=1,delete_time=now() where id in
         <foreach collection="list" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>

@@ -1,6 +1,8 @@
 package com.guoguo.fengyulou.controller.project;
 
+import com.github.pagehelper.PageInfo;
 import com.guoguo.common.CurrentUserManager;
+import com.guoguo.common.DataJson;
 import com.guoguo.common.ServerResponse;
 import com.guoguo.fengyulou.entity.project.Project;
 import com.guoguo.fengyulou.service.project.ProjectService;
@@ -32,41 +34,11 @@ public class ProjectController {
      *
      * @return
      */
-    @RequestMapping("/project/list/page")
-    public String list(HttpServletRequest request, @RequestParam String userKey, Project project) {
+    @RequestMapping("/project/list")
+    public DataJson list(@RequestParam String userKey, Project project) {
         project.setUserId(currentUserManager.getUserId(userKey));
-        request.setAttribute("pageInfo", projectService.getProjectListPage(project));
-        request.setAttribute("data", project);
-        return "project/project-list";
-    }
-
-    /**
-     * 添加页面
-     *
-     * @param request
-     * @return
-     */
-    @RequestMapping("/project/insert")
-    public String insert(HttpServletRequest request, @RequestParam String userKey) {
-        request.setAttribute("pageTitle", "添加项目");
-        return "project/project-save";
-    }
-
-    /**
-     * 修改页面
-     *
-     * @param request
-     * @param session
-     * @param project
-     * @return
-     */
-    @RequestMapping("/project/update")
-    public String update(HttpServletRequest request, @RequestParam String userKey, Project project) {
-        request.setAttribute("pageTitle", "修改项目");
-        // 查询项目
-        project.setUserId(currentUserManager.getUserId(userKey));
-        request.setAttribute("data", projectService.getProjectByIdAndUserId(project));
-        return "project/project-save";
+        PageInfo<Project> pageInfo = projectService.getProjectListPage(project);
+        return DataJson.list(pageInfo.getTotal(), pageInfo.getList());
     }
 
     /**
@@ -90,9 +62,8 @@ public class ProjectController {
      * @param ids
      * @return
      */
-    @RequestMapping("/project/ajax/delete")
-    @ResponseBody
-    public ServerResponse ajaxDelete(@RequestParam List<Long> ids, @RequestParam String userKey) {
+    @RequestMapping("/project/delete")
+    public ServerResponse delete(@RequestParam List<Long> ids, @RequestParam String userKey) {
         if (ObjectUtils.isNull(ids)) {
             return ServerResponse.createByErrorMessage("请选择数据");
         }

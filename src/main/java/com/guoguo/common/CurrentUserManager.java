@@ -90,4 +90,40 @@ public class CurrentUserManager {
         redisManager.setDays(userKey, user, StringUtils.strTurnLong(TimeConstant.NUMBER_ONE));
         return userKey;
     }
+
+    /**
+     * 获取当前登录用户名称
+     *
+     * @param userKey
+     * @return
+     */
+    public String getUserName(String userKey) {
+        try {
+            User user = getUser(userKey);
+            if (ObjectUtils.isNotNull(user)) {
+                return user.getName();
+            }
+        } catch (Exception e) {
+            log.error("获取用户id异常", e);
+        }
+        return "无名氏";
+    }
+
+    /**
+     * 获取当前登录用户类型
+     *
+     * @param userKey
+     * @return
+     */
+    public Integer getUserType(String userKey) {
+        try {
+            User user = getUser(userKey);
+            if (ObjectUtils.isNotNull(user)) {
+                return user.getType();
+            }
+        } catch (Exception e) {
+            log.error("获取用户id异常", e);
+        }
+        return 0;
+    }
 }

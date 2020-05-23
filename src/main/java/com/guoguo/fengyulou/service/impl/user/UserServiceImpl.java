@@ -38,9 +38,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ServerResponse updatePasswordById(String userKey, String password) {
+    public ServerResponse updatePasswordById(String userKey, String oldPwd, String newPwd, String newPwdTwo) {
+        if (!newPwd.equals(newPwdTwo)) {
+            return ServerResponse.createByErrorMessage("两次密码不一致");
+        }
         User user = currentUserManager.getUser(userKey);
-        user.setPassword(MD5Util.MD5EncodeUtf8(password));
+        if (!user.getPassword().equals(MD5Util.MD5EncodeUtf8(oldPwd))) {
+            return ServerResponse.createByErrorMessage("旧密码错误");
+        }
+        user.setPassword(MD5Util.MD5EncodeUtf8(newPwd));
         int rows = userDao.updatePasswordById(user);
         if (rows > 0) {
             return ServerResponse.createBySuccessMessage("修改成功");

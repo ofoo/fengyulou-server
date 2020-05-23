@@ -64,8 +64,7 @@ public class TaskLabelController {
      * @param ids
      * @return
      */
-    @RequestMapping("/taskLabel/ajax/delete")
-    @ResponseBody
+    @RequestMapping("/taskLabel/delete")
     public ServerResponse ajaxDelete(@RequestParam List<Long> ids, @RequestParam String userKey) {
         if (ObjectUtils.isNull(ids)) {
             return ServerResponse.createByErrorMessage("请选择数据");

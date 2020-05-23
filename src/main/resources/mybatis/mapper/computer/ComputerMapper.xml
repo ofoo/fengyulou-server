@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.guoguo.fengyulou.dao.computer.ComputerDao">
     <insert id="insertComputer" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        insert into fengyulou_computer(project_id, host, port, account,password,user_id,add_time,update_time) values (#{projectId},#{host},#{port},#{account},#{password},#{userId},now(),now())
+        insert into fengyulou_computer(project_id, host, port, account,password,user_id,insert_time) values (#{projectId},#{host},#{port},#{account},#{password},#{userId},now())
     </insert>
     <update id="updateComputerByIdAndUserId">
         update fengyulou_computer set
@@ -16,7 +16,7 @@
         and user_id=#{userId}
     </update>
     <update id="deleteComputerByIdsAndUserId">
-        update fengyulou_computer set `delete`=1 where id in
+        update fengyulou_computer set `delete`=1,delete_time=now() where id in
         <foreach collection="ids" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
@@ -26,6 +26,7 @@
     <select id="getComputerList" resultType="com.guoguo.fengyulou.entity.computer.Computer">
         select
         fengyulou_computer.id,
+        fengyulou_computer.project_id,
         fengyulou_project.name projectName,
         fengyulou_computer.host,
         fengyulou_computer.port,

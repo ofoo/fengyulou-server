@@ -1,6 +1,8 @@
 package com.guoguo.fengyulou.controller.computer;
 
+import com.github.pagehelper.PageInfo;
 import com.guoguo.common.CurrentUserManager;
+import com.guoguo.common.DataJson;
 import com.guoguo.common.ServerResponse;
 import com.guoguo.fengyulou.entity.computer.Computer;
 import com.guoguo.fengyulou.entity.member.Member;
@@ -11,28 +13,23 @@ import com.guoguo.fengyulou.service.project.ProjectService;
 import com.guoguo.util.ObjectUtils;
 import com.guoguo.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
  * 与服务器管理
  */
-@Controller
+@RestController
 @RequestMapping("/fyl")
 public class ComputerController {
 
     @Autowired
     private ComputerService computerService;
-    @Autowired
-    private ProjectService projectService;
-    @Autowired
-    private MemberService memberService;
     @Autowired
     private CurrentUserManager currentUserManager;
 
@@ -41,61 +38,11 @@ public class ComputerController {
      *
      * @return
      */
-    @RequestMapping("/computer/list/page")
-    public String list(HttpServletRequest request, @RequestParam String userKey, Computer computer) {
+    @RequestMapping("/computer/list")
+    public DataJson list(@RequestParam String userKey, Computer computer) {
         computer.setUserId(currentUserManager.getUserId(userKey));
-        request.setAttribute("pageInfo", computerService.getComputerListPage(computer));
-        request.setAttribute("data", computer);
-        return "computer/computer-list";
-    }
-
-    /**
-     * 添加页面
-     *
-     * @param request
-     * @return
-     */
-    @RequestMapping("/computer/insert")
-    public String insert(HttpServletRequest request, @RequestParam String userKey) {
-        request.setAttribute("pageTitle", "添加任务");
-        //获取用户id
-        Long userId = currentUserManager.getUserId(userKey);
-        // 查询项目列表
-        Project project = new Project();
-        project.setUserId(userId);
-        request.setAttribute("projectList", projectService.getProjectList(project));
-        // 查询人员列表
-        Member member = new Member();
-        member.setUserId(userId);
-        request.setAttribute("memberList", memberService.getMemberList(member));
-        return "computer/computer-save";
-    }
-
-    /**
-     * 修改页面
-     *
-     * @param request
-     * @param session
-     * @param computer
-     * @return
-     */
-    @RequestMapping("/computer/update")
-    public String update(HttpServletRequest request, @RequestParam String userKey, Computer computer) {
-        request.setAttribute("pageTitle", "修改任务");
-        //获取用户id
-        Long userId = currentUserManager.getUserId(userKey);
-        // 查询任务
-        computer.setUserId(userId);
-        request.setAttribute("data", computerService.getComputerByIdAndUserId(computer));
-        // 查询项目列表
-        Project project = new Project();
-        project.setUserId(userId);
-        request.setAttribute("projectList", projectService.getProjectList(project));
-        // 查询人员列表
-        Member member = new Member();
-        member.setUserId(userId);
-        request.setAttribute("memberList", memberService.getMemberList(member));
-        return "computer/computer-save";
+        PageInfo<Computer> pageInfo = computerService.getComputerListPage(computer);
+        return DataJson.list(pageInfo.getTotal(), pageInfo.getList());
     }
 
     /**
@@ -104,9 +51,8 @@ public class ComputerController {
      * @param computer
      * @return
      */
-    @RequestMapping("/computer/ajax/save")
-    @ResponseBody
-    private ServerResponse ajaxSave(@RequestParam String userKey, Computer computer) {
+    @RequestMapping("/computer/save")
+    private ServerResponse save(@RequestParam String userKey, Computer computer) {
         if (ObjectUtils.isNull(computer.getProjectId())) {
             return ServerResponse.createByErrorMessage("请选择项目名称");
         }
@@ -132,9 +78,9 @@ public class ComputerController {
      * @param ids
      * @return
      */
-    @RequestMapping("/computer/ajax/delete")
+    @RequestMapping("/computer/delete")
     @ResponseBody
-    private ServerResponse ajaxDelete(@RequestParam List<Long> ids, @RequestParam String userKey) {
+    private ServerResponse delete(@RequestParam List<Long> ids, @RequestParam String userKey) {
         if (ObjectUtils.isNull(ids)) {
             return ServerResponse.createByErrorMessage("请选择数据");
         }

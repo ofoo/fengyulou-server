@@ -1,9 +1,7 @@
 package com.guoguo.fengyulou.controller.user;
 
-import com.guoguo.common.CommonConstant;
-import com.guoguo.common.CurrentUserManager;
-import com.guoguo.common.RedisManager;
-import com.guoguo.common.ServerResponse;
+import com.github.pagehelper.PageInfo;
+import com.guoguo.common.*;
 import com.guoguo.fengyulou.entity.user.User;
 import com.guoguo.fengyulou.service.user.UserService;
 import com.guoguo.util.ObjectUtils;
@@ -16,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户管理
@@ -39,43 +39,14 @@ public class UserController {
      * @param user
      * @return
      */
-    @RequestMapping("/user/list/page")
-    public String list(HttpServletRequest request, HttpSession session, User user, Model model) {
-        request.setAttribute("data", user);
-        request.setAttribute("pageInfo", userService.getUserListPage(user));
-        return "user/user-list";
+    @RequestMapping("/user/list")
+    public DataJson list(User user) {
+        PageInfo<User> pageInfo = userService.getUserListPage(user);
+        return DataJson.list(pageInfo.getTotal(), pageInfo.getList());
     }
 
-    /**
-     * 添加页面
-     *
-     * @param request
-     * @return
-     */
-    @RequestMapping("/user/insert")
-    public String insert(HttpServletRequest request, HttpSession session) {
-        request.setAttribute("pageTitle", "添加用户");
-        request.setAttribute("password", "111111");
-        return "user/user-save";
-    }
-
-    /**
-     * 修改页面
-     *
-     * @param request
-     * @param id
-     * @return
-     */
-    @RequestMapping("/user/update/{id}")
-    public String update(HttpServletRequest request, HttpSession session, @PathVariable Long id) {
-        request.setAttribute("pageTitle", "修改用户");
-        request.setAttribute("data", userService.getUserById(id));
-        return "user/user-save";
-    }
-
-    @RequestMapping("/user/ajax/save")
-    @ResponseBody
-    public ServerResponse ajaxSave(HttpSession session, User user) {
+    @RequestMapping("/user/save")
+    public ServerResponse save(HttpSession session, User user) {
         if (StringUtils.isBlank(user.getLoginName())) {
             return ServerResponse.createByErrorMessage("请输入账号");
         }
@@ -91,9 +62,8 @@ public class UserController {
      * @param ids
      * @return
      */
-    @RequestMapping("/user/ajax/delete")
-    @ResponseBody
-    public ServerResponse ajaxDelete(@RequestParam List<Long> ids, HttpSession session) {
+    @RequestMapping("/user/delete")
+    public ServerResponse delete(@RequestParam List<Long> ids, HttpSession session) {
         if (ObjectUtils.isNull(ids)) {
             return ServerResponse.createByErrorMessage("请选择数据");
         }
@@ -111,7 +81,10 @@ public class UserController {
         User tem = userService.login(user);
         if (ObjectUtils.isNotNull(tem)) {
             String userKey = currentUserManager.login(tem);
-            return ServerResponse.createBySuccess("登录成功", userKey);
+            Map<String, String> map = new HashMap<>();
+            map.put("userKey", userKey);
+            map.put("currUserName", tem.getName());
+            return ServerResponse.createBySuccess("登录成功", map);
         }
         return ServerResponse.createByErrorMessage("账号或密码错误");
     }
@@ -123,25 +96,32 @@ public class UserController {
      * @return
      */
     @RequestMapping("/user/logout")
-    public String logout(@RequestParam String userKey) {
+    public ServerResponse logout(@RequestParam String userKey) {
         currentUserManager.logout(userKey);
-        return "redirect:" + CommonConstant.LOGIN;
+        return ServerResponse.createBySuccess();
     }
 
     /**
      * 修改用户密码
      *
-     * @param response
-     * @param pwd
+     * @param userKey
+     * @param oldPwd
+     * @param newPwd
      * @return
      */
-    @RequestMapping("/user/ajaxUpdatePwd")
-    @ResponseBody
-    public ServerResponse ajaxUpdatePwd(@RequestParam String userKey, @RequestParam String pwd) {
-        ServerResponse serverResponse = userService.updatePasswordById(userKey, pwd);
-        if (serverResponse.isSuccess()) {
-            currentUserManager.logout(userKey);
-        }
-        return serverResponse;
+    @RequestMapping("/user/update/pwd")
+    public ServerResponse updatePwd(@RequestParam String userKey, @RequestParam String oldPwd, @RequestParam String newPwd, @RequestParam String newPwdTwo) {
+        return userService.updatePasswordById(userKey, oldPwd, newPwd, newPwdTwo);
+    }
+
+    /**
+     * 获取用户姓名
+     *
+     * @param userKey
+     * @return
+     */
+    @RequestMapping("/user/name")
+    public ServerResponse userName(@RequestParam String userKey) {
+        return ServerResponse.createBySuccess(currentUserManager.getUserName(userKey));
     }
 }

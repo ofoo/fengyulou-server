@@ -1,6 +1,8 @@
 package com.guoguo.fengyulou.controller.member.label;
 
+import com.github.pagehelper.PageInfo;
 import com.guoguo.common.CurrentUserManager;
+import com.guoguo.common.DataJson;
 import com.guoguo.common.ServerResponse;
 import com.guoguo.fengyulou.entity.member.label.MemberLabel;
 import com.guoguo.fengyulou.service.member.label.MemberLabelService;
@@ -32,45 +34,15 @@ public class MemberLabelController {
     /**
      * 列表页面
      *
-     * @param request
+     * @param userKey
      * @param memberLabel
      * @return
      */
-    @RequestMapping("/memberLabel/list/page")
-    public String list(HttpServletRequest request, @RequestParam String userKey, MemberLabel memberLabel) {
-        request.setAttribute("data", memberLabel);
+    @RequestMapping("/memberLabel/list")
+    public DataJson list(@RequestParam String userKey, MemberLabel memberLabel) {
         memberLabel.setUserId(currentUserManager.getUserId(userKey));
-        request.setAttribute("pageInfo", memberLabelService.getMemberLabelListPage(memberLabel));
-        return "/member/label/member-label-list";
-    }
-
-    /**
-     * 添加页面
-     *
-     * @param request
-     * @return
-     */
-    @RequestMapping("/memberLabel/insert")
-    public String insert(HttpServletRequest request, HttpSession session) {
-        request.setAttribute("pageTitle", "添加人员标签");
-        return "member/label/member-label-save";
-    }
-
-    /**
-     * 修改页面
-     *
-     * @param request
-     * @param session
-     * @param memberLabel
-     * @return
-     */
-    @RequestMapping("/memberLabel/update")
-    public String update(HttpServletRequest request, @RequestParam String userKey, MemberLabel memberLabel) {
-        request.setAttribute("pageTitle", "修改人员标签");
-        // 查询人员标签
-        memberLabel.setUserId(currentUserManager.getUserId(userKey));
-        request.setAttribute("data", memberLabelService.getMemberLabelByIdAndUserId(memberLabel));
-        return "member/label/member-label-save";
+        PageInfo<MemberLabel> pageInfo = memberLabelService.getMemberLabelListPage(memberLabel);
+        return DataJson.list(pageInfo.getTotal(), pageInfo.getList());
     }
 
     /**
@@ -94,9 +66,9 @@ public class MemberLabelController {
      * @param ids
      * @return
      */
-    @RequestMapping("/memberLabel/ajax/delete")
+    @RequestMapping("/memberLabel/delete")
     @ResponseBody
-    public ServerResponse ajaxDelete(@RequestParam List<Long> ids, @RequestParam String userKey) {
+    public ServerResponse delete(@RequestParam List<Long> ids, @RequestParam String userKey) {
         if (ObjectUtils.isNull(ids)) {
             return ServerResponse.createByErrorMessage("请选择数据");
         }

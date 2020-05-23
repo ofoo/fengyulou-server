@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.guoguo.fengyulou.dao.member.MemberDao">
     <insert id="insertMember" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        insert into fengyulou_member(`name`,member_label_id,mobile,user_id) values (#{name},#{memberLabelId},#{mobile},#{userId})
+        insert into fengyulou_member(`name`,member_label_id,mobile,user_id,insert_time) values (#{name},#{memberLabelId},#{mobile},#{userId},now())
     </insert>
     <update id="updateMemberByIdAndUserId">
-        update fengyulou_member set `name`=#{name},member_label_id=#{memberLabelId},mobile=#{mobile} where id=#{id} and user_id=#{userId}
+        update fengyulou_member set `name`=#{name},member_label_id=#{memberLabelId},mobile=#{mobile},update_time=now() where id=#{id} and user_id=#{userId}
     </update>
     <update id="deleteMemberByIdsAndUserId">
-        update fengyulou_member set `delete`=1 where id in
+        update fengyulou_member set `delete`=1,delete_time=now() where id in
         <foreach collection="ids" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>

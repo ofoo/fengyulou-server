@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.guoguo.fengyulou.dao.project.ProjectDao">
     <insert id="insertProject" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        insert into fengyulou_project(`name`,user_id) values (#{name},#{userId})
+        insert into fengyulou_project(`name`,user_id,update_time) values (#{name},#{userId},now())
     </insert>
     <update id="updateProjectByIdAndUserId">
-        update fengyulou_project set `name`=#{name} where id=#{id} and user_id=#{userId}
+        update fengyulou_project set `name`=#{name},update_time=now() where id=#{id} and user_id=#{userId}
     </update>
     <update id="deleteProjectByIdsAndUserId">
-        update fengyulou_project set `delete`=1 where id in
+        update fengyulou_project set `delete`=1,delete_time=now() where id in
         <foreach collection="ids" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>

@@ -20,10 +20,12 @@ public interface UserService {
     /**
      * 按id修改用户密码
      *
-     * @param password
+     * @param userKey
+     * @param oldPwd
+     * @param newPwd
      * @return
      */
-    ServerResponse updatePasswordById(String userKey, String password);
+    ServerResponse updatePasswordById(String userKey, String oldPwd, String newPwd, String newPwdTwo);
 
     /**
      * 按条件分页查询

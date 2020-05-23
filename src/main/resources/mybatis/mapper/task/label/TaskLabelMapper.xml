@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.guoguo.fengyulou.dao.task.label.TaskLabelDao">
     <insert id="insertTaskLabel" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        insert into fengyulou_task_label(`name`,user_id,<include refid="CommonMapper.insertTimeColumn"/>) values (#{name},#{userId},<include refid="CommonMapper.currentTime"/>)
+        insert into fengyulou_task_label(`name`,user_id,insert_time) values (#{name},#{userId},now())
     </insert>
     <update id="updateTaskLabelByIdAndUserId">
-        update fengyulou_task_label set `name`=#{name} where id=#{id} and user_id=#{userId}
+        update fengyulou_task_label set `name`=#{name},update_time=now() where id=#{id} and user_id=#{userId}
     </update>
     <update id="deleteTaskLabelByIdsAndUserId">
-        update fengyulou_task_label set `delete`=1 where id in
+        update fengyulou_task_label set `delete`=1,delete_time=now() where id in
         <foreach collection="ids" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>

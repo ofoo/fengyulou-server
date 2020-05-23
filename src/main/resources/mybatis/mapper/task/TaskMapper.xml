@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.guoguo.fengyulou.dao.task.TaskDao">
     <insert id="insertTask" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        insert into fengyulou_task(project_id, sketch, task_label_id, member_id,user_id,<include refid="CommonMapper.insertTimeColumn"/>) values (#{projectId},#{sketch},#{taskLabelId},#{memberId},#{userId},<include refid="CommonMapper.currentTime"/>)
+        insert into fengyulou_task(project_id, sketch, task_label_id, member_id,user_id,insert_time) values (#{projectId},#{sketch},#{taskLabelId},#{memberId},#{userId},now())
     </insert>
     <update id="updateTaskByIdAndUserId">
         update fengyulou_task set
@@ -13,12 +13,12 @@
         <if test="status==0">finish_time=null,</if>
         <if test="status==1">finish_time=now(),</if>
         member_id=#{memberId},
-        <include refid="CommonMapper.updateTime"/>
+        update_time=now()
         where id=#{id}
         and user_id=#{userId}
     </update>
     <update id="deleteTaskByIdsAndUserId">
-        update fengyulou_task set `delete`=1,<include refid="CommonMapper.deleteTime"/> where id in
+        update fengyulou_task set `delete`=1,delete_time=now() where id in
         <foreach collection="ids" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
