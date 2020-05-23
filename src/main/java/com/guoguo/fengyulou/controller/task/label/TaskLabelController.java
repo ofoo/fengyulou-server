@@ -1,6 +1,8 @@
 package com.guoguo.fengyulou.controller.task.label;
 
+import com.github.pagehelper.PageInfo;
 import com.guoguo.common.CurrentUserManager;
+import com.guoguo.common.DataJson;
 import com.guoguo.common.ServerResponse;
 import com.guoguo.fengyulou.entity.task.label.TaskLabel;
 import com.guoguo.fengyulou.service.task.label.TaskLabelService;
@@ -34,12 +36,11 @@ public class TaskLabelController {
      * @param taskLabel
      * @return
      */
-    @RequestMapping("/taskLabel/list/page")
-    public String list(HttpServletRequest request, @RequestParam String userKey, TaskLabel taskLabel) {
+    @RequestMapping("/taskLabel/list")
+    public DataJson list(@RequestParam String userKey, TaskLabel taskLabel) {
         taskLabel.setUserId(currentUserManager.getUserId(userKey));
-        request.setAttribute("pageInfo", taskLabelService.getTaskLabelListPage(taskLabel));
-        request.setAttribute("data", taskLabel);
-        return "task/label/task-label-list";
+        PageInfo<TaskLabel> pageInfo = taskLabelService.getTaskLabelListPage(taskLabel);
+        return DataJson.list(pageInfo.getTotal(),pageInfo.getList());
     }
 
     /**

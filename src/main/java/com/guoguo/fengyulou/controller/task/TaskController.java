@@ -14,7 +14,6 @@ import com.guoguo.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -99,9 +98,11 @@ public class TaskController {
     /**
      * 修改任务状态完成
      */
-    @RequestMapping("/task/ajax/updateStatus")
-    @ResponseBody
-    public ServerResponse ajaxUpdateStatus(@RequestParam List<Long> ids, @RequestParam String userKey) {
+    @RequestMapping("/task/update/status")
+    public ServerResponse updateStatus(@RequestParam List<Long> ids, @RequestParam String userKey) {
+        if (ObjectUtils.isNull(ids)) {
+            return ServerResponse.createByErrorMessage("请选择数据");
+        }
         return taskService.updateStatusByIdsAndUserId(ids, currentUserManager.getUserId(userKey));
     }
 }
